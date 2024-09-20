@@ -2,6 +2,8 @@ from flask import Flask, render_template, request
 import pandas as pd
 import folium
 from folium.plugins import HeatMap
+from io import BytesIO
+import base64
 
 app = Flask(__name__)
 
@@ -11,12 +13,11 @@ df_cidades['municipio'] = df_cidades['municipio'].str.strip().str.lower()
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
+    mapa_html = None
     try:
         if request.method == 'POST':
             # Processa o arquivo de chamados enviado
             file_chamados = request.files['file_chamados']
-
-            # Lê o arquivo de chamados
             df_chamados = pd.read_excel(file_chamados)
 
             # Processa os DataFrames
@@ -48,11 +49,15 @@ def index():
             # Adiciona a camada de HeatMap ao mapa
             HeatMap(heat_data, radius=15, blur=10, min_opacity=0.4).add_to(mapa)
 
-            # Salva o mapa em um arquivo HTML na pasta static
-            mapa.save('static/mapa.html')
-            print("Mapa salvo em static/mapa.html")
+            # Salvar o mapa em um objeto BytesIO
+            mapa_io = BytesIO()
+            mapa.save(mapa_io, close_file=False)
 
-            return render_template('index.html', mapa='static/mapa.html')
+            # Codificar em base64
+            mapa_html = base64.b64encode(mapa_io.getvalue()).decode()
+            mapa_html = f"data:text/html;base64,{mapa_html}"
+
+            return render_template('index.html', mapa=mapa_html)
 
     except Exception as e:
         return f"Ocorreu um erro: {str(e)}", 500
