@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mapa de Chamados</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            margin-top: 20px;
+        }
+        h1, h2 {
+            color: #343a40;
+        }
+        iframe {
+            border: 2px solid #007bff;
+            border-radius: 5px;
+        }
+        .custom-file-label::after {
+            content: "Selecionar";
+            background-color: #007bff;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="header-title display-4">Gerar Mapa de Calor</h1>
+        <form method="post" enctype="multipart/form-data" class="mt-4">
+            <div class="form-group">
+                <label for="file_chamados">Arquivo de Chamados (Excel):</label>
+                <div class="custom-file">
+                    <input type="file" name="file_chamados" accept=".xlsx" required class="custom-file-input" id="fileInput">
+                    <label class="custom-file-label" for="fileInput">Escolher arquivo...</label>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Carregar</button>
+        </form>
+
+        {% if mapa %}
+            <h2 class="mt-5">Mapa de Chamados</h2>
+            <iframe src="{{ mapa }}" width="100%" height="500px"></iframe>
+        {% endif %}
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        // Atualiza o texto do label do arquivo selecionado
+        document.querySelector('#fileInput').addEventListener('change', function() {
+            const fileName = this.files[0] ? this.files[0].name : 'Escolher arquivo...';
+            document.querySelector('.custom-file-label').innerText = fileName;
+        });
+    </script>
+</body>
+</html>
