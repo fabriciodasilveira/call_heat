@@ -41,7 +41,7 @@ def index():
             # Criação do mapa
             latitude_brasil = -15.8267
             longitude_brasil = -47.9218
-            mapa = folium.Map(location=[latitude_brasil, longitude_brasil], zoom_start=5)
+            mapa = folium.Map(location=[latitude_brasil, longitude_brasil], zoom_start=4)
 
             # Preparação dos dados para o HeatMap
             heat_data = [[row['latitude'], row['longitude']] for index, row in df_pontos_chamados.iterrows()]
