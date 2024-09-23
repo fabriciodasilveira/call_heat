@@ -32,9 +32,9 @@ def index():
                 how='left'
             )
 
-            df_pontos_chamados = df_pontos_chamados[['CHAMADO', 'AGE', 'CLIENTES', 'FILIAL', 'NOME_TECNICO', 
+            df_pontos_chamados = df_pontos_chamados[['CHAMADO', 'AGE_ABERTURA', 'CLIENTES', 'FILIAL', 'NOME DO TECNICO', 
                                                        'SLA_HOJE', 'MUNICIPIO', 'DENTRO_SLA', 'FORA_SLA', 
-                                                       'BREAK_FIX', 'ELEGIVEL', 'longitude', 'latitude']]
+                                                       'BREAK_FIX', 'TOT_ELEGIVEL', 'longitude', 'latitude']]
 
             df_pontos_chamados = df_pontos_chamados.dropna(subset=['longitude', 'latitude'])
 
