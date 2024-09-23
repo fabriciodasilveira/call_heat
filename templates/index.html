@@ -24,16 +24,12 @@
             background-color: #007bff;
             color: white;
         }
-        .progress {
-            display: none;
-            height: 30px;
-        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1 class="header-title display-4"> Call Delivery Viewer </h1>
-        <form id="uploadForm" method="post" enctype="multipart/form-data" class="mt-4">
+        <h1 class="header-title display-4">Gerar Mapa de Calor</h1>
+        <form method="post" enctype="multipart/form-data" class="mt-4">
             <div class="form-group">
                 <label for="file_chamados">Arquivo de Chamados (Excel):</label>
                 <div class="custom-file">
@@ -44,15 +40,13 @@
             <button type="submit" class="btn btn-primary btn-block">Carregar</button>
         </form>
 
-        <div class="progress mt-4">
-            <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%;" id="progressBar">0%</div>
-        </div>
-
-        <div id="mapContainer" class="mt-4"></div>
-
+        {% if mapa %}
+    </br>
+        <iframe src="{{ mapa }}" width="100%" height="500px" style="border: none;"></iframe>
+        {% endif %}
     </div>
 
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script>
@@ -60,41 +54,6 @@
         document.querySelector('#fileInput').addEventListener('change', function() {
             const fileName = this.files[0] ? this.files[0].name : 'Escolher arquivo...';
             document.querySelector('.custom-file-label').innerText = fileName;
-        });
-
-        // Exibe a barra de progresso durante o upload
-        $('#uploadForm').on('submit', function(e) {
-            e.preventDefault();
-
-            const formData = new FormData(this);
-            $('.progress').show();
-
-            $.ajax({
-                xhr: function() {
-                    const xhr = new window.XMLHttpRequest();
-                    xhr.upload.addEventListener('progress', function(e) {
-                        if (e.lengthComputable) {
-                            const percentComplete = Math.round((e.loaded / e.total) * 100);
-                            $('#progressBar').css('width', percentComplete + '%');
-                            $('#progressBar').text(percentComplete + '%');
-                        }
-                    });
-                    return xhr;
-                },
-                type: 'POST',
-                url: '/',
-                data: formData,
-                processData: false,
-                contentType: false,
-                success: function(response) {
-                    $('#mapContainer').html('<iframe src="' + response.mapa + '" width="100%" height="500px" style="border: none;"></iframe>');
-                    $('.progress').hide();
-                },
-                error: function() {
-                    alert('Ocorreu um erro durante o upload.');
-                    $('.progress').hide();
-                }
-            });
         });
     </script>
 </body>
