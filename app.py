@@ -4,12 +4,19 @@ import folium
 from folium.plugins import HeatMap
 from io import BytesIO
 import base64
+import unicodedata
 
 app = Flask(__name__)
 
+
+def remover_acentos(texto):
+    if isinstance(texto, str):
+        return unicodedata.normalize('NFKD', texto).encode('ASCII', 'ignore').decode('utf-8')
+    return texto
+
 # Carregar o DataFrame de cidades
 df_cidades = pd.read_csv("municipios.csv")
-df_cidades['municipio'] = df_cidades['municipio'].str.strip().str.lower()
+df_cidades['municipio'] = df_cidades['municipio'].apply(remover_acentos).str.strip().str.lower()
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -21,7 +28,7 @@ def index():
             df_chamados = pd.read_excel(file_chamados)
 
             # Processa os DataFrames
-            df_chamados['MUNICIPIO'] = df_chamados['MUNICIPIO'].str.strip().str.lower()
+            df_chamados['MUNICIPIO'] = df_chamados['MUNICIPIO'].apply(remover_acentos).str.strip().str.lower()
 
             # Merge dos DataFrames
             df_pontos_chamados = pd.merge(
@@ -32,9 +39,9 @@ def index():
                 how='left'
             )
 
-            df_pontos_chamados = df_pontos_chamados[['CHAMADO', 'AGE_ABERTURA', 'CLIENTES', 'FILIAL', 'NOME DO TECNICO', 
-                                                       'SLA_HOJE', 'MUNICIPIO', 'DENTRO_SLA', 'FORA_SLA', 
-                                                       'BREAK_FIX', 'TOT_ELEGIVEL', 'longitude', 'latitude']]
+            # df_pontos_chamados = df_pontos_chamados[['CHAMADO', 'AGE_ABERTURA', 'CLIENTES', 'FILIAL', 'NOME DO TECNICO', 
+            #                                            'SLA_HOJE', 'MUNICIPIO', 'DENTRO_SLA', 'FORA_SLA', 
+            #                                            'BREAK_FIX', 'TOT_ELEGIVEL', 'longitude', 'latitude']]
 
             df_pontos_chamados = df_pontos_chamados.dropna(subset=['longitude', 'latitude'])
 
@@ -47,7 +54,16 @@ def index():
             heat_data = [[row['latitude'], row['longitude']] for index, row in df_pontos_chamados.iterrows()]
 
             # Adiciona a camada de HeatMap ao mapa
-            HeatMap(heat_data, radius=15, blur=10, min_opacity=0.4).add_to(mapa)
+            HeatMap(heat_data, radius=9, blur=12, min_opacity=0.4).add_to(mapa)
+            
+            
+             # Adiciona marcadores de pontos
+            # for index, row in df_pontos_chamados.iterrows():
+            #     folium.Marker(
+            #         location=[row['latitude'], row['longitude']],
+            #         popup=f"Chamado: {row['CHAMADO']}<br/> Municipio: {row['MUNICIPIO']}",
+            #         icon=folium.Icon(color='blue', icon='info-sign')
+            #     ).add_to(mapa)
 
             # Salvar o mapa em um objeto BytesIO
             mapa_io = BytesIO()
